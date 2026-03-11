@@ -657,7 +657,7 @@ const handleSubmit = async (e) => {
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 bg-white/10 flex items-center justify-center border-3 border-white/30 overflow-hidden">
                 {entreprise.logo ? (
                   <img
-                  src={`http://localhost:5000/${entreprise.logo}`} 
+                  src={`https://backend-production-36f5.up.railway.app/${entreprise.logo}`} 
                     alt={entreprise.nom}
                     className="w-full h-full object-cover"
                   />

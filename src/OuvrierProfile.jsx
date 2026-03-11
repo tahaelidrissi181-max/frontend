@@ -128,7 +128,7 @@ const OuvrierProfile = () => {
                   <div className="w-32 h-32 mx-auto mb-4 rounded-full border-4 border-white/30 shadow-2xl overflow-hidden bg-white/20 backdrop-blur-sm">
                     {ouvrier[0].photo ? (
                       <img 
-                        src={`http://localhost:5000/${ouvrier[0].photo}`}
+                        src={`https://backend-production-36f5.up.railway.app/${ouvrier[0].photo}`}
                         alt={ouvrier[0].nom_complet}
                         className="w-full h-full object-cover"
                       />

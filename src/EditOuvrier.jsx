@@ -208,7 +208,7 @@ const EditOuvrier = ({ ouvrier, isOpen, onClose, onUpdate }) => {
                 <div className="relative w-32 h-32 mb-4">
                   <div className="w-full h-full rounded-full border-4 border-purple-200 overflow-hidden bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center shadow-lg">
                     {photoPreview
-                      ? <img src={`http://localhost:5000/${photoPreview}`}
+                      ? <img src={`https://backend-production-36f5.up.railway.app/${photoPreview}`}
  alt="Preview" className="w-full h-full object-cover" />
                       : <i className="fa-solid fa-user text-6xl text-purple-300" />}
                   </div>

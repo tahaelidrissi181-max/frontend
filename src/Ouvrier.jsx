@@ -450,7 +450,7 @@ useEffect(() => { setCurrentPage(1); }, [searchSpeciality, searchWorker, statusF
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 bg-white/10 flex items-center justify-center border-3 border-white/30 overflow-hidden">
               {worker.photo ? (
               <img
-                src={`http://localhost:5000/${worker.photo}`}
+                src={`https://backend-production-36f5.up.railway.app/${worker.photo}`}
                 alt={worker.nom_complet}
                 className="w-full h-full object-cover"
                 />

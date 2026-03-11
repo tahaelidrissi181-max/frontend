@@ -128,7 +128,7 @@ const ViewEntreprise = () => {
             {/* Logo */}
             {e.logo ? (
               <img
-                  src={`http://localhost:5000/${e.logo}`} 
+                  src={`https://backend-production-36f5.up.railway.app/${e.logo}`} 
                 alt={e.nom}
                 className="w-28 h-28 rounded-2xl object-cover shadow-xl flex-shrink-0 border-2 border-white/20"
               />
@@ -299,7 +299,7 @@ const ViewEntreprise = () => {
                       <button
   onClick={() => {
     const link = document.createElement('a');
-    link.href =`http://localhost:5000/${e.logo}`
+    link.href =`https://backend-production-36f5.up.railway.app/${e.logo}`
     link.download = e.contrat.split('/').pop();
     link.click();
   }}

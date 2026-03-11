@@ -172,7 +172,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
                 <div className="relative mb-4">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-200 bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center shadow-lg">
                     {imagePreview ? (
-                      <img src={`http://localhost:5000/${imagePreview}`}
+                      <img src={`https://backend-production-36f5.up.railway.app/${imagePreview}`}
  alt="Preview" className="w-full h-full object-cover" />
                     ) : (
                       <i className="fa-solid fa-building text-5xl text-purple-300"></i>
