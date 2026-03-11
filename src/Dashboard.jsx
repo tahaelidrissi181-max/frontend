@@ -39,7 +39,7 @@ const Dashboard = () => {
           <button 
             onClick={() => {
     localStorage.removeItem("token"); // remove auth token
-    window.location.href = "/login";  // redirect to login page
+    window.location.href = "/";  // redirect to login page
   }}
             className="bg-white/15 backdrop-blur-md px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-white/25 text-white font-medium flex items-center gap-2 transition-all hover:bg-[#ff4757] hover:-translate-y-0.5 text-xs sm:text-sm"
           >
