@@ -27,7 +27,7 @@ const InscriptionCard = ({ inscription, index }) => {
         <div className="flex items-start justify-between mb-4">
           {inscription.logo ? (
             <img
-              src={`${BASE_URL}/${inscription.logo}`}
+              src={`https://backend-production-36f5.up.railway.app/${inscription.logo}`}
               alt={inscription.nom}
               className="w-14 h-14 rounded-2xl object-cover shadow-lg border border-white/10 flex-shrink-0"
             />

@@ -327,7 +327,7 @@ const ViewInscription = () => {
         <div className="flex flex-col sm:flex-row items-center gap-6">
 
           {e?.logo ? (
-            <img src={`${BASE_URL}/${e.logo}`} alt={e.nom} className="w-24 h-24 rounded-2xl object-cover shadow-lg flex-shrink-0" />
+            <img src={`https://backend-production-36f5.up.railway.app/${e.logo}`} alt={e.nom} className="w-24 h-24 rounded-2xl object-cover shadow-lg flex-shrink-0" />
           ) : (
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-400 to-purple-700 flex items-center justify-center shadow-lg flex-shrink-0">
               <i className="fa-solid fa-building text-white text-4xl" />
