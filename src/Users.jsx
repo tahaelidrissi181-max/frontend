@@ -267,7 +267,7 @@ const Users = () => {
   const handleDelete = async (user) => {
     if (!window.confirm(`Supprimer "${user.name}" ?`)) return
     try {
-      await api.delete(`/users/${user.id}`)
+      await api.delete(`/user/${user.id}`)
       notify('🗑️ Utilisateur supprimé.')
       fetchUsers()
     } catch (err) {
