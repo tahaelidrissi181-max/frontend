@@ -27,7 +27,7 @@ const Dashboard = () => {
       />
 
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pr-0 sm:pr-32 animate-fadeIn">
+      <div className="flex justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 pr-0 sm:pr-32 animate-fadeIn">
         <div className="welcome-text">
           <h1 className="text-base sm:text-lg md:text-xl font-medium mb-1">Bienvenue <span className="font-bold">
   {user[0].name.charAt(0).toUpperCase() + user[0].name.slice(1)}
