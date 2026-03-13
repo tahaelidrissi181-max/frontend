@@ -169,13 +169,13 @@ const OuvrierProfile = () => {
                 <div className="pt-6 space-y-3">
 
   {/* PHONE */}
-  <button
-    onClick={() => handleContact('phone')}
-    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2"
+
+  <a
+href={`tel:${ouvrier[0].phone1}`}    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2"
   >
     <i className="fa-solid fa-phone"></i>
-    {copied === 'phone' ? 'Numéro copié ✓' : 'Copier le numéro'}
-  </button>
+    phone
+  </a>
 
   {/* EMAIL */}
   {ouvrier[0].email && (

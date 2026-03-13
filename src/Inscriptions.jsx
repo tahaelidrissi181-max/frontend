@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import api from './api/axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '';
-
 const isExpiredFn = (month, year) => {
   if (!month || !year) return true;
   const now = new Date();
@@ -146,8 +144,9 @@ const Inscriptions = () => {
   const [loading, setLoading]             = useState(true);
   const [searchCompany, setSearchCompany] = useState('');
   const [searchYear, setSearchYear]       = useState('');
-  const [filter, setFilter]               = useState('all'); // 'all' | 'active' | 'expired'
-
+  const [filter, setFilter]               = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
   useEffect(() => { fetchInscs(); }, []);
 
   const fetchInscs = async () => {
@@ -177,6 +176,10 @@ const Inscriptions = () => {
   }), [inscs, searchCompany, searchYear, filter]);
 
   const hasFilters = searchCompany || searchYear || filter !== 'all';
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginatedEntreprises = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+useEffect(() => { setCurrentPage(1); }, [searchCompany, searchYear, filter]);
 
   return (
     <div className="min-h-screen text-white p-5 sm:p-8 bg-gradient-to-t from-purple-600 to-purple-700">
@@ -276,13 +279,49 @@ const Inscriptions = () => {
               {hasFilters && ' · filtré'}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filtered.map((ins, i) => (
+              {paginatedEntreprises.map((ins, i) => (
                 <InscriptionCard key={ins.id ?? ins.entid ?? i} inscription={ins} index={i} />
               ))}
             </div>
           </>
         )}
       </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all border border-white/20"
+          >
+            <i className="fa-solid fa-chevron-left text-sm" />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`w-10 h-10 rounded-full text-sm font-semibold transition-all border ${
+                page === currentPage
+                  ? 'bg-white text-purple-700 border-white shadow-lg'
+                  : 'bg-white/20 hover:bg-white/30 text-white border-white/20'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all border border-white/20"
+          >
+            <i className="fa-solid fa-chevron-right text-sm" />
+          </button>
+        </div>
+      )}
+      {filtered.length > 0 && (
+        <p className="text-center text-white/40 text-xs mt-3">
+          {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} sur {filtered.length} Entreprises
+        </p>
+      )}
     </div>
   );
 };

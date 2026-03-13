@@ -217,24 +217,21 @@ const ViewEntreprise = () => {
               )}
 
               {e.phone1 && (
-                <div className="flex items-start gap-3">
+                <a href={`tel:${e.phone1}`} className="flex items-start gap-3">
                   <span className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <i className="fa-solid fa-phone text-white/60 text-sm" />
                   </span>
                   <div>
                     <p className="text-xs text-white/40 font-medium">Téléphone principal</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-white font-semibold hover:text-white/80 transition-colors">
-                        {e.phone1}
-                      </p>
-                      
+                      <p className="text-sm text-white font-semibold hover:text-white/80 transition-colors">{e.phone1}</p>
                     </div>
                   </div>
-                </div>
+                </a>
               )}
 
               {e.phone2 && (
-                <div className="flex items-start gap-3">
+                <a href={`tel:${e.phone2}`} className="flex items-start gap-3">
                   <span className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <i className="fa-solid fa-phone text-white/60 text-sm" />
                   </span>
@@ -247,7 +244,7 @@ const ViewEntreprise = () => {
                       
                     </div>
                   </div>
-                </div>
+                </a>
               )}
 
               {!e.location && !e.email && !e.phone1 && !e.phone2 && (
@@ -293,23 +290,39 @@ const ViewEntreprise = () => {
 
                 {e.contrat && (
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-                    <i className="fa-solid fa-file-contract text-white/40 text-lg" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-white/40 font-medium">Contrat</p>
-                      <button
-  onClick={() => {
-    const link = document.createElement('a');
-    link.href =`https://backend-production-36f5.up.railway.app/${e.logo}`
-    link.download = e.contrat.split('/').pop();
-    link.click();
-  }}
-  className="text-sm text-blue-300 font-semibold hover:text-blue-200 transition-colors truncate block"
->
-  <i className="fa-solid fa-eye mr-1.5 text-xs" />
-  Voir
-</button>
-                    </div>
-                  </div>
+  <i className="fa-solid fa-file-contract text-white/40 text-lg" />
+  <div className="flex-1 min-w-0">
+    <p className="text-xs text-white/40 font-medium mb-2">Contrat</p>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => {
+          window.open(`https://backend-production-36f5.up.railway.app/${e.contrat}`, '_blank');
+        }}
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 text-xs font-semibold rounded-lg border border-blue-500/30 transition-all"
+      >
+        <i className="fa-solid fa-eye text-xs" />
+        Voir
+      </button>
+
+      <button
+        onClick={async () => {
+          const url = `https://backend-production-36f5.up.railway.app/${e.contrat}`;
+          const response = await fetch(url);
+          const blob = await response.blob();
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = e.contrat.split('/').pop();
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }}
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-300 hover:text-green-200 text-xs font-semibold rounded-lg border border-green-500/30 transition-all"
+      >
+        <i className="fa-solid fa-download text-xs" />
+        Télécharger
+      </button>
+    </div>
+  </div>
+</div>
                 )}
               </div>
             ) : (

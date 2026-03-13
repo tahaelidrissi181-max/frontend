@@ -476,6 +476,12 @@ useEffect(() => { setCurrentPage(1); }, [searchSpeciality, searchWorker, statusF
                 <button onClick={() => handleDelete(worker.id)} className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-red-500 text-white flex items-center justify-center transition-all hover:bg-red-600 hover:scale-110 border-0 cursor-pointer" title="Supprimer">
                   <i className="fa-solid fa-trash text-sm" />
                 </button>
+                <a 
+                  href={`tel:${worker.phone}`}
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-green-500 text-white flex items-center justify-center transition-all hover:bg-green-600 hover:scale-110"
+                  title="Appeler">
+                  <i className="fa-solid fa-phone text-sm sm:text-base"></i>
+                </a>
               </div>
             </div>
           ))

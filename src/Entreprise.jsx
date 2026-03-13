@@ -709,6 +709,12 @@ const handleSubmit = async (e) => {
                 >
                   <i className="fa-solid fa-trash text-white text-sm"></i>
                 </button>
+                <a 
+                  href={`tel:${entreprise.phone1}`}
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-green-500 text-white flex items-center justify-center transition-all hover:bg-green-600 hover:scale-110"
+                  title="Appeler">
+                  <i className="fa-solid fa-phone text-sm sm:text-base"></i>
+                </a>
               </div>
             </div>
           ))
