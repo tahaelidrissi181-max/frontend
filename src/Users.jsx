@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import api from './api/axios'
 import { Link } from 'react-router-dom'
-
 
 
 const defaultForm = {
@@ -12,7 +11,6 @@ const defaultForm = {
   status: 'active',
 }
 
-// ── tiny helpers ──────────────────────────────────────────────
 const formatDate = (iso) =>
   iso ? new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
 
@@ -227,7 +225,6 @@ const Users = () => {
   const [editingUser, setEditingUser] = useState(null)
   const [showPopup, setShowPopup] = useState(false)
   const [popupMsg, setPopupMsg] = useState('')
-
   useEffect(() => { fetchUsers() }, [])
 
   const fetchUsers = async () => {
@@ -407,12 +404,12 @@ const Users = () => {
                           }`}>
                           <i className={`fa-solid ${user.status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off'} text-sm`}></i>
                         </button>
-                        {/* Edit */}
-                        <button onClick={() => handleOpenEdit(user)} title="Modifier"
+                        
+                        {user.role!='client'?<button onClick={() => handleOpenEdit(user)} title="Modifier"
                           className="w-8 h-8 rounded-full bg-purple-400/20 hover:bg-purple-400/30 text-purple-200 flex items-center justify-center transition-all hover:-translate-y-0.5">
                           <i className="fa-solid fa-pen text-xs"></i>
-                        </button>
-                        {/* Delete */}
+                        </button>:null}
+                        
                         <button onClick={() => handleDelete(user)} title="Supprimer"
                           className="w-8 h-8 rounded-full bg-red-400/20 hover:bg-red-400/30 text-red-300 flex items-center justify-center transition-all hover:-translate-y-0.5">
                           <i className="fa-solid fa-trash text-xs"></i>
