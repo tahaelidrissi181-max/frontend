@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link ,useLocation} from 'react-router-dom';
 import api from './api/axios';
 
 
 const ViewEntreprise = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [entreprise, setEntreprise] = useState(null);
   const [mise, setMise] = useState(null);
-
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState(null);
+  const location = useLocation()
+
+useEffect(() => {
+  if (!location.state?.fromApp) {
+    navigate('/', { replace: true })
+  }
+}, [])
 
   useEffect(() => { fetchData();fetchmises() }, [id]);
 

@@ -598,6 +598,7 @@ const handleRefuser = async (id) => {
 
 <Link
   to={`/demandes/${demande.id}`}
+  state={{ fromApp: true }}
   className="absolute top-24 sm:top-24 left-4 sm:left-5 w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)]"
   title="Voir"
 >

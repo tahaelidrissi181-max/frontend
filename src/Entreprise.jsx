@@ -714,6 +714,7 @@ const handleSubmit = async (e) => {
               <div className="flex gap-2 sm:gap-3 justify-center bg-white/10 p-3 rounded-full">
                 <Link
                   to={`/entreprise/${entreprise.id}`}
+                  state={{ fromApp: true }}
                   className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-pink-500 text-white flex items-center justify-center transition-all hover:bg-[#d4507a] hover:scale-110"
                   title="Voir profil"
                 >
