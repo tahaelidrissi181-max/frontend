@@ -59,9 +59,7 @@ const MiseAddOuvriers = () => {
     }
   };
 
-  const handleViewDetails = (ouvrierID) => {
-    navigate(`/ouvriers/${ouvrierID}`);
-  };
+
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -146,6 +144,7 @@ const MiseAddOuvriers = () => {
           </Link>
           <Link
             to={`/mise-en-place-ouvriers/${id}`}
+            state={{ fromApp: true }}
             className="px-6 py-3 bg-white/15 backdrop-blur-md rounded-2xl flex items-center gap-2 border-2 border-transparent hover:bg-white/25 hover:border-white/30 transition-all font-semibold text-sm"
           >
             <i className="fa-solid fa-users" />
@@ -153,6 +152,7 @@ const MiseAddOuvriers = () => {
           </Link>
           <Link
             to={`/réunions/${id}`}
+            state={{ fromApp: true }}
             className="px-6 py-3 bg-white/15 backdrop-blur-md rounded-2xl flex items-center gap-2 border-2 border-transparent hover:bg-white/25 hover:border-white/30 transition-all font-semibold text-sm"
           >
             <i className="fa-solid fa-file-lines" />
@@ -271,13 +271,14 @@ const MiseAddOuvriers = () => {
                       >
                         <i className="fa-solid fa-plus" />
                       </button>
-                      <button
-                        onClick={() => handleViewDetails(ouvrier.id)}
+                      <Link
+                        to={`/ouvriers/${ouvrier.id}`}
+                        state={{ fromApp: true }}
                         className="px-4 py-2 bg-white/10 border-2 border-white/20 rounded-xl font-semibold text-xs hover:bg-white/20 transition-all flex items-center gap-2"
                         title="Voir les détails"
                       >
                         <i className="fa-solid fa-eye" />
-                      </button>
+                      </Link>
                     </div>
                   </td>
                 </tr>
