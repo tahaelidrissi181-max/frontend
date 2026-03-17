@@ -3,30 +3,40 @@ import { Link } from 'react-router-dom';
 import api from './api/axios';
 import SidePopup from './SidePopup';
 import EditDemande from './EditDemande';
+import { useStateContext } from "./Context/contextproviders";
+import { useLocation, useNavigate } from 'react-router-dom'
 
-const Demandes = () => {
+const EntrepriseDemandes = () => {
   const [searchSpeciality, setSearchSpeciality] = useState('');
-  const [searchEntreprise, setSearchEntreprise] = useState('');
-  const [entreprisesData, setEntreprisesData] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [demandesData, setDemandesData] = useState([]);
+  const [insc, setInsc] = useState([]);
   const [selectedDemande, setSelectedDemande] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
-
-  const [formData, setFormData] = useState({entreprise: '',poste: '',competences_requises: [''],nombre_postes: 1,salaire_min: '',salaire_max: '',type_contrat: 'CDI',description: '',date_entretien: '',lieu_entretien: '',status: 'attent'});
+  const { user } = useStateContext();
+  const [formData, setFormData] = useState({poste: '',competences_requises: [''],nombre_postes: 1,salaire_min: '',salaire_max: '',type_contrat: 'CDI',description: '',date_entretien: '',lieu_entretien: '',status: 'attent'});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchDemandes();
-    fetchEntreprises();
+    fetchInscs()
   }, []);
 
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!location.state?.fromApp) {
+      navigate('/', { replace: true })
+    }
+  }, [])
+
   const fetchDemandes = () => {
-    api.get('/demandes')
+    api.get(`/demandes/${user[0].entrepriseID}`)
       .then(res => {
         setDemandesData(res.data);
       })
@@ -35,31 +45,54 @@ const Demandes = () => {
       });
   };
 
-  const fetchEntreprises = () => {
-    api.get('/activeentreprises')
+  const fetchInscs = () => {
+    api.get(`/lastinsc/${user[0].entrepriseID}`)
       .then(res => {
-        setEntreprisesData(res.data);
+        setInsc(res.data);
       })
       .catch(err => {
         console.error(err);
       });
   };
 
+  
+
   const filteredDemandes = demandesData.filter(demande => {
-    const entrepriseMatch = demande.nom.toLowerCase().includes(searchEntreprise.toLowerCase());
+
     const specialityMatch = demande.poste.toLowerCase().includes(searchSpeciality.toLowerCase());
     const statusMatch = statusFilter === 'all' || demande.status === statusFilter;
-    return entrepriseMatch && specialityMatch && statusMatch;
+    return specialityMatch && statusMatch;
   });
 
   const totalPages = Math.ceil(filteredDemandes.length / ITEMS_PER_PAGE);
     const paginatedDemandes = filteredDemandes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-  useEffect(() => { setCurrentPage(1); }, [searchSpeciality, searchEntreprise, statusFilter]);
+  useEffect(() => { setCurrentPage(1); }, [searchSpeciality, statusFilter]);
+
 
   const handleAddDemande = () => {
+    if (insc && insc.length > 0) {
+    const lastInsc = insc[0]
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1 // 1-12
+    const currentYear = now.getFullYear()
+
+    const isExpired =
+      lastInsc.year < currentYear ||
+      (lastInsc.year === currentYear && lastInsc.month < currentMonth)
+
+    if (isExpired) {
+      setShowPopup(true)
+      setMessage('❌ Votre abonnement est expiré. Veuillez le renouveler.')
+      return
+    }
+  } else {
+    // No subscription at all
+    setShowPopup(true)
+    setMessage("❌ Vous n'avez pas d'abonnement actif.")
+    return
+  }
     setShowAddForm(true);
     setFormData({
-      entreprise: '',
       poste: '',
       competences_requises: [''],
       nombre_postes: 1,
@@ -84,8 +117,6 @@ const Demandes = () => {
       [name]: value
     }));
   };
-
-
 
   const handleAddSkill = () => {
     setFormData(prev => ({
@@ -121,7 +152,8 @@ const Demandes = () => {
 
       const dataToSubmit = {
         ...formData,
-        competences_requises: skills
+        competences_requises: skills,
+        entreprise:user[0].entrepriseID
       };
 
       const response = await api.post('/demandes', dataToSubmit);
@@ -132,7 +164,6 @@ const Demandes = () => {
         setMessage("Demande ajouté avec succès !")
 
         setFormData({
-          entreprise: '',
           poste: '',
           competences_requises: [''],
           nombre_postes: 1,
@@ -154,53 +185,6 @@ const Demandes = () => {
     }
     
   };
-
-  const handleTraiter = async (id) => {
-  try {
-    await api.put(`/status/${id}`, { status: 'Traité' });
-    fetchDemandes();
-    setShowPopup(true);
-    setMessage("✅ La demande a été traitée avec succès !");
-  } catch (error) {
-    console.error('Error updating demande:', error);
-    alert("❌ Erreur lors de la mise à jour du statut.");
-  }
-};
-
-const handleRefuser = async (id) => {
-  try {
-    await api.put(`/status/${id}`, { status: 'Refusé' });
-    fetchDemandes();
-    setShowPopup(true);
-    setMessage("✅ La demande a été refusée avec succès !");
-  } catch (error) {
-    console.error('Error updating demande:', error);
-    alert("❌ Erreur lors de la mise à jour du statut.");
-  }
-};
-
-
-  const getLogoGradient = (index) => {
-    const gradients = [
-      'bg-gradient-to-br from-purple-500 to-purple-700',
-      'bg-gradient-to-br from-blue-400 to-cyan-400',
-      'bg-gradient-to-br from-pink-500 to-yellow-400',
-      'bg-gradient-to-br from-green-400 to-blue-500',
-      'bg-gradient-to-br from-red-400 to-pink-500',
-      'bg-gradient-to-br from-yellow-400 to-orange-500'
-    ];
-    return gradients[index % gradients.length];
-  };
-
-  const getInitials = (name) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   function handleUpdate(e){
     setSelectedDemande(e)
   }
@@ -260,29 +244,18 @@ const handleRefuser = async (id) => {
             <div>
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 <i className="fa-solid fa-building mr-2 text-purple-600"></i>
-                Entreprise <span className="text-red-500">*</span>
+                Entreprise 
               </label>
 
-              {entreprisesData ? <div className="relative">
-                <select 
-                  name="entreprise"
-                  value={formData.entreprise} 
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-400 transition-all cursor-pointer"
-                >
-                  <option value="">-- Choisir la société --</option>
-                  {entreprisesData.map((item, index) => (
-                    <option key={index} value={item.id}>
-                      {item.nom}
-                    </option>
-                  ))}
-                </select>
-
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-purple-600">
-                  <i className="fa-solid fa-chevron-down text-sm"></i>
-                </div>
-              </div>:null}
+              <input
+                type="text"
+                name="poste"
+                value={user[0].name}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                placeholder="Ex: Développeur Full Stack"
+              />
+                
             </div>
 
             {/* Position */}
@@ -535,16 +508,7 @@ const handleRefuser = async (id) => {
           />
         </div>
 
-        <div className="flex-1 min-w-0 bg-[rgba(108,148,223,0.5)] backdrop-blur-md px-5 py-3 rounded-full flex items-center gap-3 border border-white/20">
-          <i className="fa-solid fa-magnifying-glass text-white"></i>
-          <input
-            type="text"
-            value={searchEntreprise}
-            onChange={(e) => setSearchEntreprise(e.target.value)}
-            placeholder="Recherche par entreprise"
-            className="flex-1 bg-transparent border-none outline-none text-white text-xs sm:text-sm placeholder-white/70"
-          />
-        </div>
+        
 
         <select
           value={statusFilter}
@@ -564,8 +528,6 @@ const handleRefuser = async (id) => {
           <span className="hidden sm:inline">Ajouter Demande</span>
           <span className="sm:hidden">Ajouter</span>
         </button>
-
-        
       </div>
 
       {/* Demandes Grid */}
@@ -577,107 +539,93 @@ const handleRefuser = async (id) => {
           </div>
         ) : (
           paginatedDemandes.map((demande, index) => (
-            <div
-              key={demande.id}
-              className="bg-gradient-to-br from-[rgba(108,148,223,0.4)] to-[rgba(88,118,183,0.4)] backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-6 relative transition-all duration-400 border-2 border-white/20 shadow-xl hover:-translate-y-2 hover:shadow-2xl"
-            >
-<button
-  onClick={() => handleUpdate(demande)}
-  className="absolute top-1 sm:top-1 left-4 sm:left-5 w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(147,51,234,0.5)]"
-  title="Modifier"
->
-  <i className="fa-solid fa-pen text-white text-sm"></i>
-</button>
-<button
-  onClick={() => handleDelete(demande.id)}
-  className="absolute top-12 sm:top-12 left-4 sm:left-5 w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(239,68,68,0.5)]"
-  title="Supprimer"
->
-  <i className="fa-solid fa-trash text-white text-sm"></i>
-</button>
-
-<Link
-  to={`/demandes/${demande.id}`}
-  className="absolute top-24 sm:top-24 left-4 sm:left-5 w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)]"
-  title="Voir"
->
-  <i className="fa-solid fa-eye text-white text-sm"></i>
-</Link>
-
-              <div className={`w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4 ${getLogoGradient(index)} rounded-2xl flex items-center justify-center text-white text-3xl sm:text-4xl font-bold shadow-xl`}>
-                {getInitials(demande.nom)}
-              </div>
-
-              <div className="text-center mb-5">
-                <div className="text-base sm:text-lg font-semibold mb-4 text-white">
-                  {demande.nom}
-                </div>
-                <div className="text-xs sm:text-sm leading-relaxed space-y-1.5">
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Poste :</strong>
-                    <span>{demande.poste}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Compétences :</strong>
-                    <span>{demande.competence}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Nb postes :</strong>
-                    <span>{demande.NumPostes} poste(s)</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Salaire :</strong>
-                    <span>{demande.min}-{demande.max} DH</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Contrat :</strong>
-                    <span>{demande.contrat}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Description :</strong>
-<span>
-  {demande.description?.slice(0, 10)}
-  {demande.description?.length > 10 && "..."}
-</span>                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Date entretien :</strong>
-<span>
-  {new Date(demande.dateEntretien).toISOString().split("T")[0]}
-</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <strong className="min-w-[140px] opacity-90">Lieu :</strong>
-                    <span>{demande.localEntretien}</span>
-                  </div>
-                </div>
-              </div>
-
-             {demande.status === "attent" ? (
-  <div className="flex gap-3 mt-5">
-    <button
-      onClick={() => handleTraiter(demande.id)}
-      className="flex-1 px-5 py-3 bg-[#00d47e] text-white rounded-full font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all hover:bg-[#00a861] hover:-translate-y-1 hover:shadow-lg"
-    >
-      <i className="fa-solid fa-check"></i>
-      <span>Traiter</span>
-    </button>
-
-    <button
-      onClick={() => handleRefuser(demande.id)}
-      className="flex-1 px-5 py-3 bg-[#ff4757] text-white rounded-full font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all hover:bg-[#d63447] hover:-translate-y-1 hover:shadow-lg"
-    >
-      <i className="fa-solid fa-xmark"></i>
-      <span>Refuser</span>
-    </button>
-  </div>
-): demande.status === "Refusé" ? (
-  <div className="mt-5 px-5 py-3 bg-[#ff4757] bg-opacity-20 border-2 border-[#ff4757] rounded-full text-center">
-    <div className="flex items-center justify-center gap-2 text-[#ff4757] font-semibold">
-      <i className="fa-solid fa-circle-xmark text-lg"></i>
-      <span>Demande refusée</span>
+  <div
+    key={demande.id}
+    className="bg-gradient-to-br from-[rgba(108,148,223,0.4)] to-[rgba(88,118,183,0.4)] backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-6 relative transition-all duration-400 border-2 border-white/20 shadow-xl hover:-translate-y-2 hover:shadow-2xl"
+  >
+    {/* Action buttons - top right row */}
+    <div className="absolute top-4 right-4 flex gap-2">
+      <button
+        onClick={() => handleUpdate(demande)}
+        className="w-8 h-8 rounded-full bg-purple-500 hover:bg-purple-500/60 border border-purple-400/40 flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(147,51,234,0.4)]"
+        title="Modifier"
+      >
+        <i className="fa-solid fa-pen text-white text-xs"></i>
+      </button>
+      <button
+        onClick={() => handleDelete(demande.id)}
+        className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-500/60 border border-red-400/40 flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(239,68,68,0.4)]"
+        title="Supprimer"
+      >
+        <i className="fa-solid fa-trash text-white text-xs"></i>
+      </button>
+      <Link
+        to={`/demandes/${demande.id}`}
+        state={{ fromApp: true }}
+        className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-500/60 border border-blue-400/40 flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(59,130,246,0.4)]"
+        title="Voir"
+      >
+        <i className="fa-solid fa-eye text-white text-xs"></i>
+      </Link>
     </div>
-  </div>
-) : null}
+
+    {/* Content */}
+    <div className="text-center mb-5 mt-8">
+      <div className="text-xs sm:text-sm leading-relaxed space-y-1.5">
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Poste :</strong>
+          <span>{demande.poste}</span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Compétences :</strong>
+          <span>{demande.competence}</span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Nb postes :</strong>
+          <span>{demande.NumPostes} poste(s)</span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Salaire :</strong>
+          <span>{demande.min}-{demande.max} DH</span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Contrat :</strong>
+          <span>{demande.contrat}</span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Description :</strong>
+          <span>
+            {demande.description?.slice(0, 10)}
+            {demande.description?.length > 10 && "..."}
+          </span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Date entretien :</strong>
+          <span>{new Date(demande.dateEntretien).toISOString().split("T")[0]}</span>
+        </div>
+        <div className="flex gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
+          <strong className="min-w-[140px] opacity-90">Lieu :</strong>
+          <span>{demande.localEntretien}</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Status badge */}
+    {demande.status === "attent" ? (
+      <div className="mt-4 px-4 py-2.5 bg-yellow-500/10 border border-yellow-500/40 rounded-full text-center">
+        <div className="flex items-center justify-center gap-2 text-yellow-400 font-semibold text-sm">
+          <i className="fa-solid fa-clock"></i>
+          <span>Demande En Attent</span>
+        </div>
+      </div>
+    ) : demande.status === "Refusé" ? (
+      <div className="mt-4 px-4 py-2.5 bg-red-500/10 border border-red-500/40 rounded-full text-center">
+        <div className="flex items-center justify-center gap-2 text-red-400 font-semibold text-sm">
+          <i className="fa-solid fa-circle-xmark"></i>
+          <span>Demande refusée</span>
+        </div>
+      </div>
+    )  : null}
             </div>
           ))
         )}
@@ -777,4 +725,4 @@ const handleRefuser = async (id) => {
   );
 };
 
-export default Demandes;
+export default EntrepriseDemandes;

@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react'
 import api from './api/axios'
 import { Link } from 'react-router-dom'
 
-const ROLES = ['admin', 'manager', 'user']
-const STATUSES = ['active', 'inactive']
+
 
 const defaultForm = {
   name: '',
   email: '',
   password: '',
-  role: 'user',
+  role: 'support',
   status: 'active',
 }
 
@@ -64,7 +63,7 @@ const UserForm = ({ isOpen, onClose, onSave, editingUser, onError }) => {
   useEffect(() => {
     if (!isOpen) return
     setFormData(isEdit
-      ? { name: editingUser.name ?? '', email: editingUser.email ?? '', password: '', role: editingUser.role ?? 'user', status: editingUser.status ?? 'active' }
+      ? { name: editingUser.name ?? '', email: editingUser.email ?? '', password: '', role: editingUser.role ?? 'support', status: editingUser.status ?? 'active' }
       : defaultForm
     )
     setShowPassword(false)
@@ -178,8 +177,7 @@ const UserForm = ({ isOpen, onClose, onSave, editingUser, onError }) => {
               </label>
               <select name="role" value={formData.role} onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                <option value="user">Utilisateur</option>
-                <option value="manager">Manager</option>
+                <option value="support">Support</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -329,9 +327,9 @@ const Users = () => {
         <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)}
           className="bg-white/20 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 text-white text-sm outline-none cursor-pointer min-w-[140px]">
           <option value="all" className="bg-purple-700">Tous les rôles</option>
-          <option value="admin"   className="bg-purple-700">Admin</option>
-          <option value="manager" className="bg-purple-700">Manager</option>
-          <option value="user"    className="bg-purple-700">Utilisateur</option>
+          <option value="support" className="bg-purple-700">Support</option>
+                <option value="client" className="bg-purple-700">Client</option>
+                <option value="admin" className="bg-purple-700">Admin</option>
         </select>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
           className="bg-white/20 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 text-white text-sm outline-none cursor-pointer min-w-[140px]">

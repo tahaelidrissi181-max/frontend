@@ -25,7 +25,7 @@ const MiseAddOuvriers = () => {
 
   const fetchOuvriers = () => {
     setLoading(true);
-    api.get('/ouvriers')
+    api.get('/activeouvriers')
       .then(res => { setOuvriers(res.data); })
       .catch(err => { console.error('Error fetching ouvriers:', err); })
       .finally(() => { setLoading(false); });

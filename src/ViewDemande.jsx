@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate ,useLocation} from 'react-router-dom';
 import api from './api/axios';
+import { useStateContext } from './Context/contextproviders';
 
 const ViewDemande = () => {
   const { id } = useParams();
@@ -8,7 +9,15 @@ const ViewDemande = () => {
   const [demande, setDemande] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [actionLoading, setActionLoading] = useState(null); // ✅ was missing
+  const [actionLoading, setActionLoading] = useState(null);
+  const { user } = useStateContext();
+  const location = useLocation()
+
+useEffect(() => {
+  if (!location.state?.fromApp) {
+    navigate('/', { replace: true })
+  }
+}, [])
 
   useEffect(() => {
     fetchDemandeDetails();
@@ -27,7 +36,6 @@ const ViewDemande = () => {
     }
   };
 
-  // ✅ Fixed: uses fetchDemandeDetails() not fetchDemandes(), no missing setShowPopup
   const handleTraiter = async (demandeId) => {
     if (!window.confirm('Marquer cette demande comme traitée ?')) return;
     setActionLoading('traiter');
@@ -42,7 +50,6 @@ const ViewDemande = () => {
     }
   };
 
-  // ✅ Fixed: same as above
   const handleRefuser = async (demandeId) => {
     if (!window.confirm('Refuser cette demande ?')) return;
     setActionLoading('refuser');
@@ -92,9 +99,12 @@ const ViewDemande = () => {
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Erreur</h2>
           <p className="text-gray-600 mb-6">{error || 'Demande introuvable'}</p>
-          <Link to="/demandes" className="inline-block px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-all">
-            Retour aux demandes
-          </Link>
+          <button
+      onClick={() => navigate(-1)}
+      className="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors group"
+    >
+            Retour 
+          </button>
         </div>
       </div>
     );
@@ -108,9 +118,9 @@ const ViewDemande = () => {
 
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-6">
-        <button onClick={() => navigate('/demandes')} className="flex items-center gap-2 text-white hover:text-purple-200 transition-colors mb-4">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white hover:text-purple-200 transition-colors mb-4">
           <i className="fa-solid fa-arrow-left"></i>
-          <span className="font-medium">Retour aux demandes</span>
+          <span className="font-medium">Retour </span>
         </button>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -128,6 +138,7 @@ const ViewDemande = () => {
               {d.status}
             </span>
           ) : (
+            user[0].role !='client' ?
             <div className="flex gap-3">
               <button
                 onClick={() => handleTraiter(d.id)}
@@ -149,7 +160,10 @@ const ViewDemande = () => {
                   : <><i className="fa-solid fa-xmark"></i> Refuser</>
                 }
               </button>
-            </div>
+            </div>:<span className="px-4 py-2 rounded-full text-white font-semibold text-sm bg-yellow-500 flex items-center gap-2">
+              <i className="fa-solid fa-clock"></i>
+              En attet
+            </span>
           )}
         </div>
       </div>

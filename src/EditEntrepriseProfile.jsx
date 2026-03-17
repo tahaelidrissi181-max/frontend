@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import api from './api/axios'
 import SidePopup from './SidePopup'
+import { useStateContext } from './Context/contextproviders'
 
-const EditEntreprise = ({ entreprise, isOpen, onClose, onUpdate }) => {
+const EditEntrepriseProfile = ({ isOpen, onClose, onUpdate }) => {
+      const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     nom_entreprise: '',
     secteur_activite: '',
@@ -14,16 +16,28 @@ const EditEntreprise = ({ entreprise, isOpen, onClose, onUpdate }) => {
     abonnement: 1,
     ranking: '5',
     status: 'active',
+    password:'',
   })
+  const { user } = useStateContext();
   const [imagePreview, setImagePreview] = useState(null)
   const [imageFile, setImageFile] = useState(null)
-  const [contract, setContract] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [fieldErrors, setFieldErrors] = useState({})
   const [abonnement, setAbonnement] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState('');
+  const [entreprise, setEntreprise] = useState(null);
 
+  const fetchData = async () => {
+    try {
+      const res = await api.get(`/entreprises/${user[0].entrepriseID}`);
+      setEntreprise(res.data.entreprise ?? res.data);
+    } catch (err) {
+      console.error(err);
+    } 
+  };
+
+  useEffect(()=>{fetchData()},[])
   useEffect(() => {
     fetchAbonnement()
     if (!entreprise || !isOpen) return
@@ -38,10 +52,10 @@ const EditEntreprise = ({ entreprise, isOpen, onClose, onUpdate }) => {
       abonnement: entreprise.abonnementID ?? 1,
       ranking: entreprise.rating?.toString() ?? '5',
       status: entreprise.status ?? 'active',
+      password: entreprise.password ?? '',
     })
     setImagePreview(entreprise.logo || null)
     setImageFile(null)
-    setContract(null)
     setFieldErrors({})
   }, [entreprise, isOpen])
 
@@ -72,12 +86,12 @@ const EditEntreprise = ({ entreprise, isOpen, onClose, onUpdate }) => {
       const payload = new FormData()
       Object.entries(formData).forEach(([k, v]) => payload.append(k, v))
       if (imageFile instanceof File) payload.append('logo', imageFile, imageFile.name)
-if (contract instanceof File) payload.append('contrat', contract, contract.name)
 
 
       await api.put(`/entreprise/${entreprise.id}`, payload ,{
   headers: { 'Content-Type': 'multipart/form-data' }}
       )
+
       if (onUpdate) onUpdate()
       onClose()
     } catch (error) {
@@ -86,6 +100,8 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
         const { message, field } = error.response.data
         setMessage(`❌ ${message}`);
         setShowPopup(true);
+        
+        // Highlight the problematic field
         const fieldInput = document.querySelector(`input[name="${field}"]`)
         if (fieldInput) {
           fieldInput.classList.add('border-red-500', 'ring-2', 'ring-red-500')
@@ -159,7 +175,6 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Logo Upload */}
             <div>
               <label className="block text-sm font-semibold mb-3 text-gray-700">
                 <i className="fa-solid fa-image mr-2 text-purple-600"></i>
@@ -210,14 +225,14 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
             <div>
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 <i className="fa-solid fa-building mr-2 text-purple-600"></i>
-                Nom de l'entreprise <span className="text-red-500">*</span>
+                Nom de l'entreprise 
               </label>
               <input
+              required
                 type="text"
                 name="nom_entreprise"
                 value={formData.nom_entreprise}
                 onChange={handleInputChange}
-                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="Ex: TechnoPlus SARL"
               />
@@ -227,7 +242,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
             <div>
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 <i className="fa-solid fa-industry mr-2 text-purple-600"></i>
-                Secteur d'activité <span className="text-red-500">*</span>
+                Secteur d'activité 
               </label>
               <input
                 type="text"
@@ -244,7 +259,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
             <div>
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 <i className="fa-solid fa-user-tie mr-2 text-purple-600"></i>
-                Responsable <span className="text-red-500">*</span>
+                Responsable 
               </label>
               <input
                 type="text"
@@ -262,7 +277,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
             <div>
               <label className="block text-sm font-semibold mb-2 text-gray-700">
                 <i className="fa-solid fa-map-marker-alt mr-2 text-purple-600"></i>
-                Localisation <span className="text-red-500">*</span>
+                Localisation 
               </label>
               <input
                 type="text"
@@ -283,6 +298,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
                 Téléphone 1
               </label>
               <input
+              required
                 type="tel"
                 name="phone1"
                 value={formData.phone1}
@@ -321,6 +337,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
                 Email
               </label>
               <input
+              required
                 type="email"
                 name="email"
                 value={formData.email}
@@ -334,6 +351,27 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
                   {fieldErrors.email}
                 </p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <i className="fa-solid fa-lock mr-2 text-purple-600"></i>
+                Mot de passe <span className="text-xs text-gray-400 font-normal ml-1">(laisser vide pour ne pas changer)</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder='Minimum 8 caractères'
+                />
+                <button type="button" onClick={() => setShowPassword(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors">
+                  <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
+              </div>
             </div>
 
             {/* Abonnement */}
@@ -362,6 +400,7 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
               </label>
               <select
                 name="ranking"
+                disabled
                 value={formData.ranking}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
@@ -384,28 +423,13 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
+                disabled
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               >
                 <option value="active">Actif</option>
                 <option value="inactive">Inactif</option>
               </select>
             </div>
-
-            {/* Contrat */}
-            <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-700">
-                <i className="fa-solid fa-file-signature mr-2 text-purple-600"></i>
-                Contrat <span className="text-xs text-gray-400 font-normal ml-1">(laisser vide pour ne pas changer)</span>
-              </label>
-              <input
-                type="file"
-                name="contrat"
-                accept="image/*"
-                onChange={e => setContract(e.target.files[0])}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-
             {/* Actions */}
             <div className="flex gap-3 pt-4">
               <button
@@ -441,4 +465,4 @@ if (contract instanceof File) payload.append('contrat', contract, contract.name)
   )
 }
 
-export default EditEntreprise
+export default EditEntrepriseProfile

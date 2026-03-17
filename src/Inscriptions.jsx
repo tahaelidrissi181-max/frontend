@@ -106,6 +106,7 @@ const InscriptionCard = ({ inscription, index }) => {
           {/* Historique button — replaces eye icon */}
           <Link
             to={`/insc/${inscription.entid}`}
+            state={{ fromApp: true }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/20 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-300"
           >
             <i className="fa-solid fa-clock-rotate-left text-[10px]" />
@@ -211,7 +212,7 @@ useEffect(() => { setCurrentPage(1); }, [searchCompany, searchYear, filter]);
           </Link>
         </div>
 
-        {/* ── Search + Filters ────────────────── */}
+
         <div className="flex flex-col gap-3 mb-8">
           {/* Search row */}
           <div className="flex flex-wrap gap-3">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from './api/axios';
 
 const OuvrierProfile = () => {
@@ -8,6 +8,13 @@ const OuvrierProfile = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [copied, setCopied] = useState(null);
+  const location = useLocation()
+
+useEffect(() => {
+  if (!location.state?.fromApp) {
+    navigate('/', { replace: true })
+  }
+}, [])
   useEffect(() => {
     const fetchOuvrier = async () => {
       try {

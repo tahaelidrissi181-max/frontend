@@ -1,31 +1,42 @@
 import { useState ,useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import api from './api/axios';
+import { useStateContext } from './Context/contextproviders';
+import { useLocation, useNavigate } from 'react-router-dom'
 
-const MiseEnPlace = () => {
+
+const EntrepriseMises = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [assignments, setAssignments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+    const { user } = useStateContext();
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!location.state?.fromApp) {
+      navigate('/', { replace: true })
+    }
+  }, [])
 
   useEffect(() => {
     fetchAssignments();
   }, []);
   
   const fetchAssignments = () => {
-    api.get('/mise')
+    api.get(`/mise/${user[0].entrepriseID}`)
       .then(res => setAssignments(res.data))
       .catch(err => console.error(err));
   };
 
   const filteredAssignments = assignments.filter(assignment =>
-    assignment.nom.toLowerCase().includes(searchQuery.toLowerCase())
+    assignment.poste.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredAssignments.length / ITEMS_PER_PAGE);
   const paginatedAssignments = filteredAssignments.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  // ✅ Fixed: use searchQuery (primitive) not filteredAssignments (new array ref every render)
   useEffect(() => { setCurrentPage(1); }, [searchQuery]);
 
   return (
@@ -62,7 +73,7 @@ const MiseEnPlace = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Chercher une entreprise ou un ouvrier..."
+            placeholder="Chercher une mission ..."
             className="bg-transparent border-none outline-none w-full text-sm placeholder-white/70"
           />
         </div>
@@ -73,7 +84,6 @@ const MiseEnPlace = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b-2 border-white/20">
-              <th className="text-left p-4 font-semibold text-xs uppercase tracking-wider">Entreprise</th>
               <th className="text-left p-4 font-semibold text-xs uppercase tracking-wider">Chantier / Mission</th>
               <th className="text-left p-4 font-semibold text-xs uppercase tracking-wider">Total Ouvriers</th>
               <th className="text-left p-4 font-semibold text-xs uppercase tracking-wider">Mise en Place</th>
@@ -91,7 +101,6 @@ const MiseEnPlace = () => {
             ) : (
               paginatedAssignments.map((assignment) => (
                 <tr key={assignment.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
-                  <td className="p-4"><strong>{assignment.nom}</strong></td>
                   <td className="p-4">
                     {assignment.poste}
                   </td>
@@ -100,12 +109,21 @@ const MiseEnPlace = () => {
                     {assignment.totalMises} / {assignment.NumPostes}
                   </td>
                   <td className="p-4">
-                    <Link
-                      to={`/mise-en-place-ajouter/${assignment.id}`}
-                      className="px-5 py-2.5 bg-white/10 border-2 border-white/20 rounded-xl font-semibold text-xs hover:bg-white/20 transition-all mr-2"
-                    >
-                      Détails
-                    </Link>
+                    <div className='flex gap-3 items-center'>
+                        <Link
+            to={`/mise-en-place-ouvriers/${assignment.id}`} state={{ fromApp: true }}
+            className="w-8 h-8 bg-white/15 backdrop-blur-md rounded-full flex items-center border-2 border-transparent justify-center hover:bg-white/25 hover:border-white/30  font-semibold text-sm"
+          >
+            <i className="fa-solid fa-users" />
+          </Link>
+          <Link
+            to={`/réunions/${assignment.id}`} state={{ fromApp: true }}
+            className="w-8 h-8 bg-white/15 backdrop-blur-md rounded-full flex items-center border-2 border-transparent justify-center hover:bg-white/25 hover:border-white/30  font-semibold text-sm"
+          >
+            <i className="fa-solid fa-file-lines" />
+          </Link>
+                    </div>
+                    
                   </td>
                 </tr>
               ))
@@ -164,4 +182,4 @@ const MiseEnPlace = () => {
   );
 };
 
-export default MiseEnPlace;
+export default EntrepriseMises;

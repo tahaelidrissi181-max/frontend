@@ -6,6 +6,7 @@ import EditEntreprise from './EditEntreprise';
 
 const Entreprise = () => {
   const [searchSpeciality, setSearchSpeciality] = useState('');
+  const [showPassword, setShowPassword] = useState(false)
   const [searchEntreprise, setSearchEntreprise] = useState('');
   const [selectedEntreprise, setSelectedEntreprise] = useState(null)
   const [entreprisesData, setEntreprisesData] = useState([]);
@@ -27,6 +28,7 @@ const Entreprise = () => {
     phone2: '',
     email: '',
     status: 'active',
+    password:'',
     image: null
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,17 +83,21 @@ useEffect(() => { setCurrentPage(1); }, [searchEntreprise, searchSpeciality, sta
       phone1: '',
       phone2: '',
       email: '',
+      password: '',
       status: 'active',
       image: null
     });
     setImagePreview(null);
     setContract(null);
+    setShowPassword(false)
+
   };
 
   const handleCloseForm = () => {
     setShowAddForm(false);
     setImagePreview(null);
     setContract(null);
+    setShowPassword(false)
   };
 
   const handleInputChange = (e) => {
@@ -157,6 +163,8 @@ const handleSubmit = async (e) => {
     submitData.append('phone2', formData.phone2);
     submitData.append('email', formData.email);
     submitData.append('status', formData.status);
+    submitData.append('password', formData.password);
+
     
     if (formData.image) {
       submitData.append('logo', formData.image);
@@ -194,18 +202,14 @@ const handleSubmit = async (e) => {
     setShowPopup(true);
 
   } catch (error) {
-    console.error('Error adding company:', error);
     
-    // ✅ Gérer les erreurs de validation (400)
     if (error.response?.status === 400) {
       const errorMessage = error.response.data.message;
       const errorField = error.response.data.field;
       
-      // Afficher le message d'erreur
       setMessage(`❌ ${errorMessage}`);
       setShowPopup(true);
       
-      // Surligner le champ problématique
       const fieldMapping = {
         'email': 'email',
         'phone1': 'phone1'
@@ -460,6 +464,28 @@ const handleSubmit = async (e) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="contact@company.com"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <i className="fa-solid fa-lock mr-2 text-purple-600"></i>
+                Mot de passe <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder='Minimum 8 caractères'
+                />
+                <button type="button" onClick={() => setShowPassword(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors">
+                  <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
+              </div>
             </div>
 
             {/* Subscription */}

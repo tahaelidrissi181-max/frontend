@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams,useLocation } from 'react-router-dom';
 import api from './api/axios';
+import { useStateContext } from './Context/contextproviders';
 
 const MiseOuvriers = () => {
   const navigate = useNavigate();
@@ -13,11 +14,20 @@ const MiseOuvriers = () => {
   const [popup, setPopup] = useState({ show: false, msg: '', type: 'success' });
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+  const { user} = useStateContext();
 
   const showPopup = (msg, type = 'success') => {
     setPopup({ show: true, msg, type });
     setTimeout(() => setPopup(p => ({ ...p, show: false })), 3500);
   };
+
+  const location = useLocation()
+
+  useEffect(() => {
+    if (!location.state?.fromApp) {
+      navigate('/', { replace: true })
+    }
+  }, [])
 
   useEffect(() => { fetchOuvriers(); }, []);
 
@@ -116,7 +126,7 @@ const MiseOuvriers = () => {
           </p>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
-            <Link
+            <Link state={{ fromApp: true }}
             to={`/réunions/${id}`}
             className="px-6 py-3 bg-white/15 backdrop-blur-md rounded-2xl flex items-center gap-2 border-2 border-transparent hover:bg-white/25 hover:border-white/30 transition-all font-semibold text-sm"
           >
@@ -247,8 +257,8 @@ const MiseOuvriers = () => {
                   {/* Actions */}
                   <td className="p-4">
                     <div className="flex gap-2">
-                      {/* Delete */}
-                      <button
+                      
+                      {user[0].role != 'client' ? <button
                         onClick={() => handleDelete(ouvrier)}
                         disabled={deletingId === ouvrier.mise_id}
                         className="px-4 py-2 bg-red-500/20 hover:bg-red-500 border border-red-500/40 rounded-xl font-semibold text-xs transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -258,16 +268,17 @@ const MiseOuvriers = () => {
                           ? <i className="fa-solid fa-spinner fa-spin" />
                           : <i className="fa-solid fa-trash" />
                         }
-                      </button>
+                      </button>:null}
 
                       {/* View */}
-                      <button
-                        onClick={() => navigate(`/ouvriers/${ouvrier.ouvrier_id}`)}
+                      <Link
+                        state={{ fromApp: true }}
+                        to={`/ouvriers/${ouvrier.ouvrier_id}`}
                         className="px-4 py-2 bg-white/10 border-2 border-white/20 rounded-xl font-semibold text-xs hover:bg-white/20 transition-all flex items-center gap-2 cursor-pointer"
                         title="Voir les détails"
                       >
                         <i className="fa-solid fa-eye" />
-                      </button>
+                      </Link>
                     </div>
                   </td>
                 </tr>

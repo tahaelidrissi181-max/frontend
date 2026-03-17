@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate,useLocation } from 'react-router-dom';
 import api from './api/axios';
-
-const BASE_URL = import.meta.env.VITE_API_URL ?? '';
-
+import { useStateContext } from './Context/contextproviders';
 const DEFAULT_FORM = {month:'', year: ''};
 
 const ViewInscription = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { user } = useStateContext();
   const [entreprise, setEntreprise]     = useState(null);
   const [inscriptions, setInscriptions] = useState([]);
   const [loading, setLoading]           = useState(true);
@@ -18,18 +16,17 @@ const ViewInscription = () => {
   const [searchYear, setSearchYear]     = useState('');
   const [sortField, setSortField]       = useState('created_at');
   const [sortDir, setSortDir] = useState('desc');
-
-  // form state
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [submitting, setSubmitting] = useState(false);
-
-  // delete state
   const [deletingId, setDeletingId] = useState(null);
-
-  // popup
   const [popup, setPopup]= useState({ show: false, msg: '', type: 'success' });
-
+  const location = useLocation()
+useEffect(() => {
+  if (!location.state?.fromApp) {
+    navigate('/', { replace: true })
+  }
+}, [])
   useEffect(() => { fetchData(); }, [id]);
 
   const showPopup = (msg, type = 'success') => {
@@ -59,7 +56,6 @@ const ViewInscription = () => {
     }
   };
 
-  // ── Add inscription ──────────────────────────────────
   const handleSubmit = async (ev) => {
   ev.preventDefault();
   setSubmitting(true);
@@ -140,7 +136,7 @@ const ViewInscription = () => {
     { label: 'Année',      field: 'year'         },
     { label: 'Prix',       field: 'price'        },
     { label: 'Créé le',    field: 'created_at'   },
-    { label: '',           field: 'actions'      }, // delete column
+    { label: '',           field: 'actions'      }
   ];
 
   const Stars = ({ rating }) => (
@@ -187,9 +183,6 @@ const ViewInscription = () => {
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         * { font-family: 'Poppins', sans-serif; }
         input::placeholder { color: rgba(255,255,255,0.55); }
-        ::-webkit-scrollbar { height: 5px; width: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.08); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 10px; }
       `}</style>
 
       {/* ── Popup toast ─────────────────────────────── */}
@@ -203,13 +196,11 @@ const ViewInscription = () => {
         </div>
       </div>
 
-      {/* ── Slide-in Add Form ────────────────────────── */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={() => setShowForm(false)} />
       )}
       <div className={`fixed top-0 right-0 h-full w-full sm:w-[440px] bg-white shadow-2xl z-50 overflow-y-auto transform transition-transform duration-500 ease-in-out ${showForm ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-6 sm:p-8">
-          {/* Form header */}
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <h2 className="text-xl font-bold text-purple-700">
               <i className="fa-solid fa-plus mr-2" />
@@ -223,7 +214,6 @@ const ViewInscription = () => {
             </button>
           </div>
 
-          {/* Entreprise badge */}
           <div className="flex items-center gap-3 mb-6 p-3 bg-purple-50 rounded-2xl border border-purple-100">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center flex-shrink-0">
               <i className="fa-solid fa-building text-white text-sm" />
@@ -391,14 +381,13 @@ const ViewInscription = () => {
           <span className="text-xs text-white/70">{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</span>
         </div>
 
-        {/* ✅ Add button */}
-        <button
+        {user[0].role != 'client' ?<button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-5 py-3 rounded-full bg-white text-purple-700 font-semibold text-sm hover:bg-purple-50 hover:scale-105 transition-all duration-300 shadow-lg border-0 cursor-pointer"
         >
           <i className="fa-solid fa-plus" />
           Ajouter
-        </button>
+        </button>:null}
       </div>
 
       {/* ── Table ────────────────────────────────────── */}

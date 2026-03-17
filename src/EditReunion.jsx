@@ -13,6 +13,8 @@ const EditReunion = ({ demande, isOpen, onClose, onUpdate }) => {
     date_entretien: '',
     lieu_entretien: '',
     status: '',
+    reunion: ''
+
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -29,6 +31,7 @@ const EditReunion = ({ demande, isOpen, onClose, onUpdate }) => {
       type_contrat: demande.contrat ?? 'CDI',
       description: demande.description ?? '',
       status: demande.status ?? '',
+      reunion:demande.reunion,
       date_entretien: demande.dateEntretien
         ? new Date(demande.dateEntretien).toISOString().split('T')[0]
         : '',
@@ -65,7 +68,6 @@ const EditReunion = ({ demande, isOpen, onClose, onUpdate }) => {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      // ✅ Built inside handleSubmit so it always uses latest formData
       const skills = formData.competences_requises
         .filter(skill => skill.trim() !== '')
         .join(', ')
@@ -312,16 +314,13 @@ const EditReunion = ({ demande, isOpen, onClose, onUpdate }) => {
                 <i className="fa-solid fa-circle-dot mr-2 text-purple-600"></i>
                 Statut <span className="text-red-500">*</span>
               </label>
-              <select
-                name="status"
-                value={formData.status}
+              <input
+                name="reunion"
+                value={formData.reunion}
                 onChange={handleInputChange}
+                readOnly
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              >
-                <option value="attent">En attente</option>
-                <option value="Traité">Traité</option>
-                <option value="Refusé">Refusé</option>
-              </select>
+              />
             </div>
 
             <div className="flex gap-3 pt-4">

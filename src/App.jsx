@@ -17,6 +17,11 @@ import ViewEntreprise from "./ViewEntreprise";
 import MiseAddOuvriers from "./MiseAddOuvriers";
 import MiseOuvriers from "./MiseOuvriers";
 import Statistics from "./Statistics";
+import Abonnement from "./Abonnement";
+import EntrepriseDemandes from "./EntrepriseDemandes";
+import EntrepriseReunion from "./EntrepriseReunion";
+import EntrepriseMises from "./EntrepriseMises";
+import EntrepriseStats from "./EntrepriseStats";
 
 const App = () => {
   const { user, loading } = useStateContext();
@@ -51,24 +56,36 @@ const App = () => {
     <Router>
       {user ? (
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          {user[0].role !="client"? 
+          <>
           <Route path="/ouvriers" element={<Ouvrier />} />
           <Route path="/entreprises" element={<Entreprise />} />
           <Route path="/entreprise/:id" element={<ViewEntreprise/>} />
           <Route path="/demandes" element={<Demandes />} />
-          <Route path="/ouvriers/:id" element={<OuvrierProfile />} />
-          <Route path="/demandes/:id" element={<ViewDemande />} />
           <Route path="/utilisateurs" element={<Users />} />
           <Route path="/Statistics" element={<Statistics/>} />
           <Route path="/réunions" element={<Reunions />} />
-          <Route path="/réunions/:id" element={<ViewReunion />} />
           <Route path="/insc" element={<Inscriptions/>} />
           <Route path="/insc/:id" element={<ViewInscription/>} />
           <Route path="/mise-en-place" element={<Mise/>} />
           <Route path="/mise-en-place-ajouter/:id" element={<MiseAddOuvriers/>} />
           <Route path="/mise-en-place-ouvriers/:id" element={<MiseOuvriers/>} />
+          <Route path="/abonnements" element={<Abonnement/>} />
+          </>
+          :
+          <>
+          <Route path="/demandes"  element={<EntrepriseDemandes/>} />
+          <Route path="/réunions" element={<EntrepriseReunion/>} />
+          <Route path="/mise-en-place" element={<EntrepriseMises/>} />
+          <Route path="/Statistics" element={<EntrepriseStats/>} />
 
-
+          </>}
+          <Route path="/" element={<Dashboard/>} />
+          <Route path="/ouvriers/:id" element={<OuvrierProfile />} />
+          <Route path="/demandes/:id" element={<ViewDemande />} />
+          <Route path="/réunions/:id" element={<ViewReunion />} />
+          <Route path="/insc/:id" element={<ViewInscription/>} />
+          <Route path="/mise-en-place-ouvriers/:id" element={<MiseOuvriers/>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       ) : (

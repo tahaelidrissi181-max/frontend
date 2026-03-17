@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from './api/axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 const ViewEntreprise = () => {
   const { id } = useParams();
@@ -112,6 +111,7 @@ const ViewEntreprise = () => {
           <div className="flex gap-2">
             <Link
               to={`/insc/${e.id}`}
+              state={{ fromApp: true }}
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-semibold transition-all"
             >
               <i className="fa-solid fa-clock-rotate-left" />

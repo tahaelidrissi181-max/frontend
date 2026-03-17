@@ -92,7 +92,7 @@ const handleRefuser = async (id) => {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Voulez-vous vraiment supprimer cette DEMANDE ?")) {
+    if (!window.confirm("Voulez-vous vraiment supprimer cette REUNION ?")) {
       return false
 }
   try {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate} from 'react-router-dom';
+import { useParams, useNavigate,useLocation } from 'react-router-dom';
 import api from './api/axios';
+import { useStateContext} from './Context/contextproviders';
 
 const ViewReunion = () => {
   const { id } = useParams();
@@ -9,6 +10,14 @@ const ViewReunion = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+  const { user } = useStateContext();
+  const location = useLocation()
+
+useEffect(() => {
+  if (!location.state?.fromApp) {
+    navigate('/', { replace: true })
+  }
+}, [])
 
   useEffect(() => {
     fetchDemandeDetails();
@@ -92,7 +101,7 @@ const ViewReunion = () => {
           <p className="text-gray-600 mb-6">{error || 'Réunion introuvable'}</p>
           {/* ✅ Fix 3: no accent in route path */}
           <button onClick={() => navigate(-1)} className="inline-block px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-all">
-            Retour aux réunions
+            Retour 
           </button>
         </div>
       </div>
@@ -110,7 +119,7 @@ const ViewReunion = () => {
         {/* ✅ Fix 3: no accent in route path */}
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white hover:text-purple-200 transition-colors mb-4">
           <i className="fa-solid fa-arrow-left"></i>
-          <span className="font-medium">Retour aux réunions</span>
+          <span className="font-medium">Retour </span>
         </button>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -128,7 +137,7 @@ const ViewReunion = () => {
               {d.reunion}
             </span>
           ) : (
-            <div className="flex gap-3">
+            user[0].role !='client' ?<div className="flex gap-3">
               <button
                 onClick={() => handleTraiter(d.id)}
                 disabled={actionLoading !== null}
@@ -149,7 +158,10 @@ const ViewReunion = () => {
                   : <><i className="fa-solid fa-xmark"></i> Refuser</>
                 }
               </button>
-            </div>
+            </div>:<span className="px-4 py-2 rounded-full text-white font-semibold text-sm bg-yellow-500 flex items-center gap-2">
+              <i className="fa-solid fa-clock"></i>
+              En attet
+            </span>
           )}
         </div>
       </div>
