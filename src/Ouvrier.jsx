@@ -467,7 +467,8 @@ useEffect(() => { setCurrentPage(1); }, [searchSpeciality, searchWorker, statusF
                 </div>
               </div>
               <div className="flex gap-2 sm:gap-3 justify-center bg-white/10 p-3 rounded-full">
-                <Link to={`/ouvriers/${worker.id}`} className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-pink-500 text-white flex items-center justify-center transition-all hover:bg-[#d4507a] hover:scale-110" title="Voir profil">
+                <Link to={`/ouvriers/${worker.id}`} state={{ fromApp: true }}
+ className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-pink-500 text-white flex items-center justify-center transition-all hover:bg-[#d4507a] hover:scale-110" title="Voir profil">
                   <i className="fa-solid fa-eye text-sm sm:text-base" />
                 </Link>
                 <button onClick={() => setSelectedOuvrier(worker)} className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-orange-500 text-white flex items-center justify-center transition-all hover:bg-[#d63447] hover:scale-110 border-0 cursor-pointer" title="Modifier">
