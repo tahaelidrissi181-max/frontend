@@ -394,7 +394,10 @@ const Users = () => {
                     {/* Actions */}
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        {/* Toggle status */}
+                        {user.role!='client'?<button onClick={() => handleOpenEdit(user)} title="Modifier"
+                          className="w-8 h-8 rounded-full bg-purple-400/20 hover:bg-purple-400/30 text-purple-200 flex items-center justify-center transition-all hover:-translate-y-0.5">
+                          <i className="fa-solid fa-pen text-xs"></i>
+                        </button>:null}
                         <button onClick={() => handleToggleStatus(user)}
                           title={user.status === 'active' ? 'Désactiver' : 'Activer'}
                           className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:-translate-y-0.5 ${
@@ -408,10 +411,7 @@ const Users = () => {
                           className="w-8 h-8 rounded-full bg-red-400/20 hover:bg-red-400/30 text-red-300 flex items-center justify-center transition-all hover:-translate-y-0.5">
                           <i className="fa-solid fa-trash text-xs"></i>
                         </button>
-                        {user.role!='client'?<button onClick={() => handleOpenEdit(user)} title="Modifier"
-                          className="w-8 h-8 rounded-full bg-purple-400/20 hover:bg-purple-400/30 text-purple-200 flex items-center justify-center transition-all hover:-translate-y-0.5">
-                          <i className="fa-solid fa-pen text-xs"></i>
-                        </button>:null}
+                        
                       </div>
                     </td>
                   </tr>
